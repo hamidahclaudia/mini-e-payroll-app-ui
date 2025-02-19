@@ -2,10 +2,6 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.1.5.
 
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
-
 ![image](https://github.com/user-attachments/assets/d9f2fc0a-9d22-48b6-9eb6-5cba5c73a89b)
 
 ![image](https://github.com/user-attachments/assets/0d5220dd-cc35-4c65-84cd-a830f5098fb5)
