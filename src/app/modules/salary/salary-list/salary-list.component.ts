@@ -3,9 +3,10 @@ import { CommonModule } from '@angular/common';
 import { SalaryService } from '../../../services/salary.service';
 import { Employee } from '../../../models/employee.model';
 import { Salary, SalaryRequest } from '../../../models/salary.model';
-import { NgFor, NgIf } from '@angular/common';
+import { NgFor } from '@angular/common';
 import { CustomCurrencyPipe } from '../../../pipes/custom-currency.pipe';
 import { FormsModule } from '@angular/forms';
+import { convertToInputDate } from '../../../utils/date-utils'
 
 @Component({
   selector: 'app-salary-list',
@@ -28,7 +29,7 @@ export class SalaryListComponent implements OnInit {
   constructor(private salaryService: SalaryService) { }
 
   ngOnInit(): void {
-    this.salaryDate = this.convertToInputDate(new Date())
+    this.salaryDate = convertToInputDate(new Date())
     this.fetchEligibleEmployees();
   }
 
@@ -53,16 +54,7 @@ export class SalaryListComponent implements OnInit {
       this.selectedEmployees.splice(index, 1);
     }
   }
-
-  convertToInputDate(date: Date | string): string {
-    if (!date) return '';
-    const d = new Date(date);
-    const year = d.getFullYear();
-    const month = (d.getMonth() + 1).toString().padStart(2, '0');
-    const day = d.getDate().toString().padStart(2, '0');
-    return `${year}-${month}-${day}`; 
-  }
-
+  
   processSalary(): void {
     if (this.selectedEmployees.length === 0) {
       alert('Please select at least one employee to process salary.');

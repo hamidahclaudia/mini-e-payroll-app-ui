@@ -6,6 +6,7 @@ import { Employee } from '../../../models/employee.model';
 import { NgFor } from '@angular/common';
 import { CustomDatePipe } from '../../../pipes/custom-date.pipe';
 import { CustomCurrencyPipe } from '../../../pipes/custom-currency.pipe';
+import { convertToInputDate } from '../../../utils/date-utils'
 
 @Component({
   selector: 'app-employee-list',
@@ -27,7 +28,6 @@ export class EmployeeListComponent implements OnInit {
   filterStatus: string = 'all';
   sortField: string = 'FullName';
   sortDirection: 'asc' | 'desc' = 'asc';
-
   showModal = false;
   editMode = false;
   employeeForm: Employee = new Employee();
@@ -65,23 +65,13 @@ export class EmployeeListComponent implements OnInit {
     if (employee) {
       this.employeeForm = {
         ...employee,
-        dob: employee.dob ? this.convertToInputDate(employee.dob) : '',
-        joinDate: employee.joinDate ? this.convertToInputDate(employee.joinDate) : '',
-        resignDate: employee.resignDate ? this.convertToInputDate(employee.resignDate) : ''
+        dob: employee.dob ? convertToInputDate(employee.dob) : '',
+        joinDate: employee.joinDate ? convertToInputDate(employee.joinDate) : '',
+        resignDate: employee.resignDate ? convertToInputDate(employee.resignDate) : ''
       };
     } else {
       this.employeeForm = new Employee();
     }
-  }
-
-  // Converts Date to 'YYYY-MM-DD' for input fields
-  convertToInputDate(date: Date | string): string {
-    if (!date) return '';
-    const d = new Date(date);
-    const year = d.getFullYear();
-    const month = (d.getMonth() + 1).toString().padStart(2, '0'); 
-    const day = d.getDate().toString().padStart(2, '0');
-    return `${year}-${month}-${day}`; 
   }
 
   closeModal(): void {
