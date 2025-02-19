@@ -1,0 +1,157 @@
+<div class="container">
+	<h2 class="text-center my-3">Employee List</h2>
+
+	<!-- Filter Section -->
+	<div class="container mb-3">
+		<div class="row">
+			<div class="col-md-3">
+				<input type="text" class="form-control" placeholder="Search by name" [(ngModel)]="filterName"
+					(input)="applyFilters()" />
+			</div>
+			<div class="col-md-3">
+				<input type="date" class="form-control" [(ngModel)]="filterDob" (change)="applyFilters()" />
+			</div>
+			<div class="col-md-3">
+				<select class="form-select" [(ngModel)]="filterStatus" (change)="applyFilters()">
+					<option value="all">All</option>
+					<option value="active">Active Staff</option>
+					<option value="resigned">Resigned Staff</option>
+				</select>
+			</div>
+			<div class="col-md-3 text-end">
+				<button class="btn btn-success" (click)="openModal()">
+					<i class="bi bi-person-plus"></i> Add Employee
+				</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- Employee Table -->
+	<div class="table-responsive">
+		<table class="table table-bordered table-hover">
+			<thead class="table-dark text-center">
+				<tr>
+					<th>Full Name</th>
+					<th>DOB</th>
+					<th>Gender</th>
+					<th>Join Date</th>
+					<th>Resign Date</th>
+					<th>Basic Salary</th>
+					<th>Allowances</th>
+					<th>Deductions</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr *ngFor="let emp of employees">
+					<td>{{ emp.fullName }}</td>
+					<td>{{ emp.dob | customDate:'dd-MM-yyyy' }}</td>
+					<td>{{ emp.gender }}</td>
+					<td>{{ emp.joinDate | customDate:'dd-MM-yyyy' }}</td>
+					<td>{{ emp.resignDate ? (emp.resignDate | customDate:'dd/MM/yyyy') : 'Active' }}</td>
+					<td>{{ emp.basicSalary | customCurrency }}</td>
+					<td>
+						<ul>
+							<li *ngFor="let allowance of emp.allowances">{{ allowance.name }}: {{ allowance.amount | customCurrency }}
+							</li>
+						</ul>
+					</td>
+					<td>
+						<ul>
+							<li *ngFor="let deduction of emp.deductions">{{ deduction.name }}: {{ deduction.amount | customCurrency }}
+							</li>
+						</ul>
+					</td>
+					<td class="text-center">
+						<button class="btn btn-warning btn-sm" (click)="openModal(emp)">
+							<i class="bi bi-pencil-square"></i> Edit
+						</button>
+						<button class="btn btn-danger btn-sm ms-1" (click)="deleteEmployee(emp.id)">
+							<i class="bi bi-trash"></i> Delete
+						</button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<!-- Employee Form Modal -->
+<div class="modal fade show" *ngIf="showModal" style="display: block;" tabindex="-1">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">{{ editMode ? 'Edit Employee' : 'Add Employee' }}</h5>
+				<button type="button" class="btn-close" (click)="closeModal()"></button>
+			</div>
+			<div class="modal-body">
+				<form (ngSubmit)="saveEmployee()">
+					<div class="mb-3">
+						<label class="form-label">Full Name:</label>
+						<input type="text" class="form-control" [(ngModel)]="employeeForm.fullName" name="fullName" required>
+						<small class="text-danger" *ngIf="validationErrors['dob']">{{ validationErrors['fullName'] }}</small>
+					</div>
+
+					<!-- Date of Birth -->
+					<div class="mb-3">
+						<label class="form-label">Date of Birth:</label>
+						<input type="date" class="form-control" [(ngModel)]="employeeForm.dob" name="dob" required>
+						<small class="text-danger" *ngIf="validationErrors['dob']">{{ validationErrors['dob'] }}</small>
+					</div>
+
+					<!-- Join Date -->
+					<div class="mb-3">
+						<label class="form-label">Join Date:</label>
+						<input type="date" class="form-control" [(ngModel)]="employeeForm.joinDate" name="joinDate" required>
+						<small class="text-danger" *ngIf="validationErrors['joinDate']">{{ validationErrors['joinDate'] }}</small>
+					</div>
+
+					<!-- Basic Salary -->
+					<div class="mb-3">
+						<label class="form-label">Basic Salary:</label>
+						<input type="number" class="form-control" [(ngModel)]="employeeForm.basicSalary" name="basicSalary"
+							required>
+						<small class="text-danger" *ngIf="validationErrors['basicSalary']">{{ validationErrors['basicSalary']
+							}}</small>
+					</div>
+
+					<div class="mb-3">
+						<label class="form-label">Resign Date:</label>
+						<input type="date" class="form-control" [(ngModel)]="employeeForm.resignDate" name="resignDate">
+					</div>
+
+					<!-- Allowances -->
+					<div class="mb-3">
+						<label class="form-label">Allowances:</label>
+						<div *ngFor="let allowance of employeeForm.allowances; let i = index">
+							<input type="text" class="form-control" [(ngModel)]="allowance.name" name="allowanceType{{i}}"
+								placeholder="Name">
+							<input type="number" class="form-control mt-2" [(ngModel)]="allowance.amount" name="allowanceAmount{{i}}"
+								placeholder="Amount">
+							<button type="button" class="btn btn-danger btn-sm mt-2" (click)="removeAllowance(i)">Remove</button>
+						</div>
+						<button type="button" class="btn btn-primary btn-sm mt-1 mx-2" (click)="addAllowance()">Add Allowance</button>
+					</div>
+
+					<!-- Deductions -->
+					<div class="mb-3">
+						<label class="form-label">Deductions:</label>
+						<div *ngFor="let deduction of employeeForm.deductions; let i = index">
+							<input type="text" class="form-control" [(ngModel)]="deduction.name" name="deductionType{{i}}"
+								placeholder="Name">
+							<input type="number" class="form-control mt-2" [(ngModel)]="deduction.amount" name="deductionAmount{{i}}"
+								placeholder="Amount">
+							<button type="button" class="btn btn-danger btn-sm mt-2" (click)="removeDeduction(i)">Remove</button>
+						</div>
+						<button type="button" class="btn btn-primary btn-sm mt-1 mx-2" (click)="addDeduction()">Add Deduction</button>
+					</div>
+
+					<div class="modal-footer">
+						<button type="submit" class="btn btn-primary">{{ editMode ? 'Update' : 'Save' }}</button>
+						<button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,41 @@
+<div class="container my-4">
+  <h2 class="text-center">Processed Salaries</h2>
+
+  <!-- Year & Month Filters -->
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <label for="year" class="form-label">Year:</label>
+      <input type="number" id="year" class="form-control" [(ngModel)]="selectedYear" (change)="fetchProcessedEmployees()">
+    </div>
+    <div class="col-md-4">
+      <label for="month" class="form-label">Month:</label>
+      <select id="month" class="form-select" [(ngModel)]="selectedMonth" (change)="fetchProcessedEmployees()">
+        <option *ngFor="let month of months" [value]="month.value">{{ month.name }}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Employee Table -->
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover">
+      <thead class="table-dark text-center">
+        <tr>
+          <th>Employee Name</th>
+          <th>Net Salary</th>
+          <th>Payslip</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let emp of employees">
+          <td>{{ emp.employeeName }}</td>
+          <td>{{ emp.totalSalary | currency }}</td>
+          <td class="text-center">
+            <button class="btn btn-primary btn-sm" (click)="downloadPayslip(emp.employeeId)">
+              <i class="bi bi-file-earmark-pdf"></i> Generate Payslip
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
